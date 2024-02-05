@@ -1,22 +1,43 @@
 document.addEventListener('DOMContentLoaded', function () {
     const quoteText = document.getElementById('quoteText');
     const generateQuoteBtn = document.getElementById('generateQuoteBtn');
+    const shareTwitterBtn = document.getElementById('shareTwitterBtn');
+    const changeColorBtn = document.getElementById('changeColorBtn');
+    const body = document.body;
 
     generateQuoteBtn.addEventListener('click', getRandomQuote);
+    shareTwitterBtn.addEventListener('click', shareOnTwitter);
+    changeColorBtn.addEventListener('click', changeBackgroundColor);
 
-    function getRandomQuote() {
-        const quotes = [
-            "The only way to do great work is to love what you do. - Steve Jobs",
-            "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
-            "Your time is limited, don't waste it living someone else's life. - Steve Jobs",
-            "It always seems impossible until it's done. - Nelson Mandela",
-            "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
-            "The only limit to our realization of tomorrow will be our doubts of today. - Franklin D. Roosevelt"
-        ];
+    async function getRandomQuote() {
+        try {
+            const response = await fetch('https://api.quotable.io/random');
+            const data = await response.json();
+            const randomQuote = `${data.content} - ${data.author}`;
+            quoteText.textContent = randomQuote;
+        } catch (error) {
+            console.error('Error fetching quote:', error);
+            quoteText.textContent = 'Failed to fetch a quote. Please try again later.';
+        }
+    }
 
-        const randomIndex = Math.floor(Math.random() * quotes.length);
-        const randomQuote = quotes[randomIndex];
+    function shareOnTwitter() {
+        const currentQuote = quoteText.textContent;
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(currentQuote)}`;
+        window.open(twitterUrl, '_blank');
+    }
 
-        quoteText.textContent = randomQuote;
+    function changeBackgroundColor() {
+        const randomColor = getRandomColor();
+        body.style.backgroundColor = randomColor;
+    }
+
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
     }
 });
